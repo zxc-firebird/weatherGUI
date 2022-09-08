@@ -34,8 +34,14 @@ def get_svg(svg_image, svg_name):
         print('Возникла ошибка')
 
 def get_weather():
+
+    #  -> Path to images
+    cwd = os.getcwd() + r'/images'
+
+    #  -> Получение название города
     city = name.get()
 
+    #  -> Получение погоды города
     r = requests.get('http://yandex.ru/pogoda/?', params=get_coords(city))
     soup = bs(r.text, 'lxml')
 
@@ -45,17 +51,14 @@ def get_weather():
     today_weather_props = soup.select('div.fact__props span.a11y-hidden')
     today_weather_image = soup.select('a.fact__basic_size_wide img.icon')
 
-    cwd = os.getcwd() + r'/images'
-
+    #  -> Цикл обработки фотографии погоды сегодня
     for image in today_weather_image:
-        flag = False
-
         image_map = image['src'][::-1]
-        image_map_temp = image_map.partition('/')[0][::-1]
+        image_map_temp = cwd + '/' + image_map.partition('/')[0][::-1]
 
-    
+        print(f'File {image_map_temp} -- {os.path.exists(image_map_temp)}')
+
         if(os.path.exists(image_map_temp)):
-            flag = True
             print(f'File {image_map_temp} is exists')
         else:
             p = requests.get(f"http:{image['src']}")
@@ -91,13 +94,21 @@ def get_weather():
 
     image_temp_list = []
 
-    for img in weekly_weather_images[1:6]:
-        
-        str_temp = img['src'][::-1]
-        # get_svg(img['src'], str_temp.partition('/')[0][::-1])
+    for image in weekly_weather_images[1:6]:
+        image_map = image['src'][::-1]
+        image_map_temp = cwd + '/' + image_map.partition('/')[0][::-1]
 
-        # print(img['src'][::-1] + '\n')
-            
+        print(f'File {image_map_temp} -- {os.path.exists(image_map_temp)}')
+
+        if(os.path.exists(image_map_temp) == False):
+            p = requests.get(f"http:{image['src']}")
+            out = open(f'{cwd}/{image_map_temp}', 'wb')
+            out.write(p.content)
+            out.close()
+            print('File was created')
+        else:
+            print(f'File {image_map_temp} is exists')
+
     for item in weekly_weather[1:6]:
         Label(window, text = item["aria-label"].replace(",", "\n"), font=('Arial', 10), width=10).pack(side=LEFT)
 
