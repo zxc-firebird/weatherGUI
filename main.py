@@ -102,12 +102,14 @@ def get_weather():
 
         if(os.path.exists(image_map_temp) == False):
             p = requests.get(f"http:{image['src']}")
-            out = open(f'{cwd}/{image_map_temp}', 'wb')
+            out = open(f'{image_map_temp}', 'wb')
             out.write(p.content)
             out.close()
             print('File was created')
         else:
             print(f'File {image_map_temp} is exists')
+
+        image_map_temp = ''
 
     for item in weekly_weather[1:6]:
         Label(window, text = item["aria-label"].replace(",", "\n"), font=('Arial', 10), width=10).pack(side=LEFT)
