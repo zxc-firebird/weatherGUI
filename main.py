@@ -54,8 +54,8 @@ def get_weather():
     #  -> Цикл обработки фотографии погоды сегодня
     for image in today_weather_image:
         image_map = image['src'][::-1]
-        image_map_temp = cwd + '/' + image_map.partition('/')[0][::-1]
-
+        image_name_temp = image_map.partition('/')[0][::-1]
+        image_map_temp = cwd + '/' + image_name_temp
         print(f'File {image_map_temp} -- {os.path.exists(image_map_temp)}')
 
         if(os.path.exists(image_map_temp)):
@@ -65,14 +65,11 @@ def get_weather():
             out = open(f'{cwd}/{image_map_temp}', 'wb')
             out.write(p.content)
             out.close()
-            print('File was created')
+            print('Svg file was created')        
+            svgfile = svg2rlg(image_map)
+            renderPM.drawToFile(svgfile, f'{image_name_temp}.png', fmt='PNG')
     
-
-    #     svgfile = svg2rlg(item['src'])
-    #     bytespng = BytesIO()
-    #     # renderPM.drawToFile(svgfile, bytespng, fmt='PNG')
-
-    #     img = Image.open(bytespng)
+        #     img = Image.open(bytespng)
 
 
     props_ = ''
@@ -96,8 +93,9 @@ def get_weather():
 
     for image in weekly_weather_images[1:6]:
         image_map = image['src'][::-1]
+        image_name_temp = image_map.partition('/')[0][::-1]
         image_map_temp = ''
-        image_map_temp = cwd + '/' + image_map.partition('/')[0][::-1]
+        image_map_temp = cwd + '/' + image_name_temp
 
         print(f'File {image_map_temp} -- {os.path.exists(image_map_temp)}')
 
