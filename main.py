@@ -3,8 +3,9 @@ import os
 from tkinter import *
 from geopy.geocoders import Nominatim
 from bs4 import BeautifulSoup as bs
-from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPM
+from cairosvg import svg2png
+# from svglib.svglib import svg2rlg
+# from reportlab.graphics import renderPM, renderPDF
 from io import BytesIO
 from PIL import Image
 
@@ -19,19 +20,6 @@ def get_coords(city):
     }
 
     return params
-
-def get_svg(svg_image, svg_name):
-    try:
-        drawing = svg2rlg(svg_image)
-        # svg_bytes = BytesIO()
-        png_name = svg_name.partition('.')[0]
-        renderPM.drawToFile(svg_image, png_name, fmt='PNG')
-
-        
-
-    except Exception as ex:
-        print(ex)
-        print('Возникла ошибка')
 
 def get_weather():
 
@@ -55,19 +43,23 @@ def get_weather():
     for image in today_weather_image:
         image_map = image['src'][::-1]
         image_name_temp = image_map.partition('/')[0][::-1]
+        image_map_temp = ''
         image_map_temp = cwd + '/' + image_name_temp
-        print(f'File {image_map_temp} -- {os.path.exists(image_map_temp)}')
+        print(f'File {image_name_temp} -- {os.path.exists(image_map_temp)}')
 
         if(os.path.exists(image_map_temp)):
             print(f'File {image_map_temp} is exists')
         else:
             p = requests.get(f"http:{image['src']}")
-            out = open(f'{cwd}/{image_map_temp}', 'wb')
+            out = open(f'{cwd}/{image_name_temp}', 'wb')
             out.write(p.content)
             out.close()
             print('Svg file was created')        
-            svgfile = svg2rlg(image_map)
-            renderPM.drawToFile(svgfile, f'{image_name_temp}.png', fmt='PNG')
+
+            svg2png(bytestring=image_map_temp, write_to=f'{image_name_temp}.png')
+
+            # renderPM.drawToFile(svg2rlg(image_map_temp), f'{cwd}/{image_name_temp}.png', fmt='PNG')
+            
     
         #     img = Image.open(bytespng)
 
@@ -101,13 +93,15 @@ def get_weather():
 
         if not (os.path.exists(image_map_temp)):
             p = requests.get(f"http:{image['src']}")
-            out = open(image_map_temp, 'wb')
+            out = open(f'{cwd}/{image_name_temp}', 'wb')
             out.write(p.content)
             out.close()
-            print('File was created')
+            print('Svg file was created')        
+            svg2png(bytestring=image_map_temp, write_to=f'{image_name_temp}.png')
         else:
             print(f'File {image_map_temp} is exists')
-
+            print(image['src'])
+           
     for item in weekly_weather[1:6]:
         Label(window, text = item["aria-label"].replace(",", "\n"), font=('Arial', 10), width=10).pack(side=LEFT)
 
